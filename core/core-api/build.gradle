@@ -1,0 +1,18 @@
+plugins {
+    id 'application'
+}
+
+application {
+    mainClass = 'org.sopt.Main'
+}
+
+run {
+    standardInput = System.in
+}
+
+dependencies {
+    implementation project(':core:core-domain')
+
+    // 나중에 runtimeOnly로 변경할 예정입니다!
+    implementation project(':storage:db-core')
+}
