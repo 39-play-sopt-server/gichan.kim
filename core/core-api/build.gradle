@@ -1,18 +1,10 @@
-plugins {
-    id 'application'
-}
-
-application {
-    mainClass = 'org.sopt.Main'
-}
-
-run {
-    standardInput = System.in
-}
+bootJar.enabled = true
+jar.enabled = false
 
 dependencies {
     implementation project(':core:core-domain')
+    runtimeOnly project(':storage:db-core')
 
-    // 나중에 runtimeOnly로 변경할 예정입니다!
-    implementation project(':storage:db-core')
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 }
