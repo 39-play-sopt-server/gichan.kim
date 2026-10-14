@@ -1,114 +1,65 @@
 package org.sopt.core.controller;
 
+import org.sopt.core.controller.request.CreatePostRequest;
+import org.sopt.core.controller.request.UpdatePostRequest;
+import org.sopt.core.controller.response.PostListResponse;
 import org.sopt.core.controller.response.PostResponse;
-import org.sopt.core.domain.post.NewPost;
 import org.sopt.core.domain.post.Post;
-import org.sopt.core.domain.post.PostCategory;
 import org.sopt.core.domain.post.PostService;
-import org.sopt.core.error.CoreException;
 import org.sopt.core.support.response.ApiResponse;
 import org.sopt.core.support.response.SuccessCode;
-import org.sopt.view.PostView;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RestController
+@RequestMapping(path = "/api/v1/posts")
 public class PostController {
-
-    private final PostView view;
     private final PostService postService;
 
-    public PostController(PostView view, PostService postService) {
-        this.view = view;
+    public PostController(PostService postService) {
         this.postService = postService;
     }
 
-    public void run() {
-        while (true) {
-            view.printMenu();
-            int command = view.readCommand();
-            switch (command) {
-                case 1 -> createPost();
-                case 2 -> readPosts();
-                case 3 -> readPost();
-                case 4 -> updatePost();
-                case 5 -> deletePost();
-                case 6 -> {
-                    view.printMessage("프로그램을 종료합니다.");
-                    return;
-                }
-                default -> view.printMessage("잘못된 입력입니다.");
-            }
-        }
+    @PostMapping
+    public ApiResponse<PostResponse> createPost(
+            @RequestBody(required = true) CreatePostRequest request
+    ) {
+        Post post = postService.write(request.toNewPost());
+        return ApiResponse.success(SuccessCode.POST_CREATED, PostResponse.from(post));
     }
 
-    private void createPost() {
-        String title = view.readTitle();
-        String content = view.readContent();
-        PostCategory category = view.readCategory();
-
-        ApiResponse<PostResponse> response;
-        try {
-            Post post = postService.write(new NewPost(title, content, category));
-            response = ApiResponse.success(SuccessCode.POST_CREATED, PostResponse.from(post));
-        } catch (CoreException e) {
-            response = ApiResponse.error(e.getErrorCode());
-        }
-        view.printResponse(response);
+    @GetMapping
+    public ApiResponse<PostListResponse> readPosts(
+            @RequestParam(name = "page", defaultValue = "1") int page
+    ) {
+        List<Post> posts = postService.readAll();
+        return ApiResponse.success(SuccessCode.POST_LIST_READ, PostListResponse.from(posts));
     }
 
-    private void readPosts() {
-        ApiResponse<List<PostResponse>> response;
-        try {
-            List<PostResponse> posts = postService.readAll().stream()
-                    .map(PostResponse::from)
-                    .toList();
-            response = ApiResponse.success(SuccessCode.POST_LIST_READ, posts);
-        } catch (CoreException e) {
-            response = ApiResponse.error(e.getErrorCode());
-        }
-        view.printPosts(response);
+    @GetMapping(path = "/{postId}")
+    public ApiResponse<PostResponse> readPost(
+            @PathVariable(name = "postId") Long postId
+    ) {
+        Post post = postService.read(postId);
+        return ApiResponse.success(SuccessCode.POST_READ, PostResponse.from(post));
     }
 
-    private void readPost() {
-        int index = view.readPostNumber("조회할 게시글 번호: ") - 1;
+    @PutMapping(path = "/{postId}")
+    public ApiResponse<PostResponse> updatePost(
+            @PathVariable(name = "postId") Long postId,
+            @RequestBody UpdatePostRequest request
+    ) {
+        Post post = postService.edit(postId, request.title(), request.content(), request.category());
+        return ApiResponse.success(SuccessCode.POST_UPDATED, PostResponse.from(post));
 
-        ApiResponse<PostResponse> response;
-        try {
-            Post post = postService.read(index);
-            response = ApiResponse.success(SuccessCode.POST_READ, PostResponse.from(post));
-        } catch (CoreException e) {
-            response = ApiResponse.error(e.getErrorCode());
-        }
-        view.printPost(response);
     }
 
-    private void updatePost() {
-        int index = view.readPostNumber("수정할 게시글 번호: ") - 1;
-
-        ApiResponse<PostResponse> response;
-        try {
-            postService.read(index);
-            String title = view.readTitle();
-            String content = view.readContent();
-            PostCategory category = view.readCategory();
-            Post post = postService.edit(index, title, content, category);
-            response = ApiResponse.success(SuccessCode.POST_UPDATED, PostResponse.from(post));
-        } catch (CoreException e) {
-            response = ApiResponse.error(e.getErrorCode());
-        }
-        view.printResponse(response);
-    }
-
-    private void deletePost() {
-        int index = view.readPostNumber("삭제할 게시글 번호: ") - 1;
-
-        ApiResponse<Void> response;
-        try {
-            postService.remove(index);
-            response = ApiResponse.success(SuccessCode.POST_DELETED);
-        } catch (CoreException e) {
-            response = ApiResponse.error(e.getErrorCode());
-        }
-        view.printResponse(response);
+    @DeleteMapping(path = "/{postId}")
+    public ApiResponse<?> deletePost(
+            @PathVariable(name = "postId") Long postId
+    ) {
+        postService.remove(postId);
+        return ApiResponse.success(SuccessCode.POST_DELETED);
     }
 }

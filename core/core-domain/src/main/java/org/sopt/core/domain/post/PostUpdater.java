@@ -1,5 +1,8 @@
 package org.sopt.core.domain.post;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class PostUpdater {
 
     private final PostRepository postRepository;
@@ -12,10 +15,10 @@ public class PostUpdater {
         this.postValidator = postValidator;
     }
 
-    public Post update(int index, String title, String content, PostCategory category) {
-        Post post = postReader.read(index);
+    public Post update(Long id, String title, String content, PostCategory category) {
+        Post post = postReader.read(id);
         postValidator.validate(title, content);
         post.update(title, content, category);
-        return postRepository.update(index, post);
+        return postRepository.update(id, post);
     }
 }

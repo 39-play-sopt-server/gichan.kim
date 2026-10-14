@@ -3,46 +3,48 @@ package org.sopt.storage.db.core.post;
 import org.sopt.core.domain.post.NewPost;
 import org.sopt.core.domain.post.Post;
 import org.sopt.core.domain.post.PostRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
+@Repository
 public class InMemoryPostRepository implements PostRepository {
 
-    private final List<PostEntity> store = new ArrayList<>();
+    private final Map<Long, PostEntity> store = new ConcurrentHashMap<>();
+    private final AtomicLong sequence = new AtomicLong();
 
     @Override
     public Post save(NewPost newPost) {
-        PostEntity entity = PostEntity.of(newPost);
-        store.add(entity);
+        Long id = sequence.incrementAndGet();
+        PostEntity entity = PostEntity.of(id, newPost);
+        store.put(id, entity);
         return entity.toDomain();
     }
 
     @Override
-    public Optional<Post> findByIndex(int index) {
-        if (index < 0 || index >= store.size()) {
-            return Optional.empty();
-        }
-        return Optional.of(store.get(index).toDomain());
+    public Optional<Post> findById(Long id) {
+        return Optional.ofNullable(store.get(id)).map(PostEntity::toDomain);
     }
 
     @Override
     public List<Post> findAll() {
-        return store.stream()
+        return store.values().stream()
+                .sorted(Comparator.comparing(PostEntity::getId))
                 .map(PostEntity::toDomain)
                 .toList();
     }
 
     @Override
-    public Post update(int index, Post post) {
+    public Post update(Long id, Post post) {
         PostEntity entity = PostEntity.from(post);
-        store.set(index, entity);
+        store.put(id, entity);
         return entity.toDomain();
     }
 
     @Override
-    public void deleteByIndex(int index) {
-        store.remove(index);
+    public void deleteById(Long id) {
+        store.remove(id);
     }
 }

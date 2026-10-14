@@ -7,11 +7,11 @@ public interface PostRepository {
 
     Post save(NewPost newPost);
 
-    Optional<Post> findByIndex(int index);
+    Optional<Post> findById(Long id);
 
     List<Post> findAll();
 
-    Post update(int index, Post post);
+    Post update(Long id, Post post);
 
-    void deleteByIndex(int index);
+    void deleteById(Long id);
 }
