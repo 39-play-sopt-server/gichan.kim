@@ -1,4 +1,6 @@
 dependencies {
     compileOnly project(':core:core-domain')
     testImplementation project(':core:core-domain')
+
+    implementation 'org.springframework:spring-context'
 }

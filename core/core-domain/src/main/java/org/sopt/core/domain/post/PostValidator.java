@@ -1,7 +1,9 @@
 package org.sopt.core.domain.post;
 
 import org.sopt.core.error.CoreException;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PostValidator {
 
     public void validate(String title, String content) {

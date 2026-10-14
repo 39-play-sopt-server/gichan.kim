@@ -1,5 +1,8 @@
 package org.sopt.core.domain.post;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class PostAppender {
 
     private final PostRepository postRepository;

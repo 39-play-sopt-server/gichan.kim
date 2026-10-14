@@ -1,7 +1,10 @@
 package org.sopt.core.domain.post;
 
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 
+@Service
 public class PostService {
 
     private final PostReader postReader;
@@ -24,15 +27,15 @@ public class PostService {
         return postReader.readAll();
     }
 
-    public Post read(int index) {
+    public Post read(Long index) {
         return postReader.read(index);
     }
 
-    public Post edit(int index, String title, String content, PostCategory category) {
-        return postUpdater.update(index, title, content, category);
+    public Post edit(Long id, String title, String content, PostCategory category) {
+        return postUpdater.update(id, title, content, category);
     }
 
-    public void remove(int index) {
-        postRemover.remove(index);
+    public void remove(Long id) {
+        postRemover.remove(id);
     }
 }

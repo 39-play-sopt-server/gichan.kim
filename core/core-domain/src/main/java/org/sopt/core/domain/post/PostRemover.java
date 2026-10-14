@@ -1,5 +1,8 @@
 package org.sopt.core.domain.post;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class PostRemover {
 
     private final PostRepository postRepository;
@@ -10,8 +13,8 @@ public class PostRemover {
         this.postReader = postReader;
     }
 
-    public void remove(int index) {
-        postReader.read(index);
-        postRepository.deleteByIndex(index);
+    public void remove(Long id) {
+        postReader.read(id);
+        postRepository.deleteById(id);
     }
 }
