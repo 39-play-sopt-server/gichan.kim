@@ -1,10 +1,13 @@
 package org.sopt.core.controller;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.sopt.core.controller.request.CreatePostRequest;
 import org.sopt.core.controller.request.UpdatePostRequest;
 import org.sopt.core.controller.response.PostListResponse;
 import org.sopt.core.controller.response.PostResponse;
 import org.sopt.core.domain.post.Post;
+import org.sopt.core.domain.post.PostCategory;
 import org.sopt.core.domain.post.PostService;
 import org.sopt.core.support.code.PostSuccessCode;
 import org.sopt.core.support.response.SuccessResponse;
@@ -31,9 +34,11 @@ public class PostController {
 
     @GetMapping
     public SuccessResponse<PostListResponse> readPosts(
-            @RequestParam(name = "page", defaultValue = "1") int page
+            @RequestParam(required = false) PostCategory category,
+            @RequestParam(name = "page", defaultValue = "1") @Min(1) int page,
+            @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size
     ) {
-        List<Post> posts = postService.readAll();
+        List<Post> posts = postService.readAll(category, page, size);
         return SuccessResponse.of(PostSuccessCode.POST_LIST_READ, PostListResponse.from(posts));
     }
 

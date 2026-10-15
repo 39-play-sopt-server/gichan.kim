@@ -1,20 +1,21 @@
 package org.sopt.core.domain.post;
 
+import org.sopt.core.error.CoreException;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PostRemover {
 
     private final PostRepository postRepository;
-    private final PostReader postReader;
 
-    public PostRemover(PostRepository postRepository, PostReader postReader) {
+    public PostRemover(PostRepository postRepository) {
         this.postRepository = postRepository;
-        this.postReader = postReader;
     }
 
     public void remove(Long id) {
-        postReader.read(id);
+        if (!postRepository.existsById(id)) {
+            throw new CoreException(PostErrorCode.POST_NOT_FOUND);
+        }
         postRepository.deleteById(id);
     }
 }

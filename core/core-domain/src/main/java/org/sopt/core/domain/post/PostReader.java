@@ -19,7 +19,7 @@ public class PostReader {
                 .orElseThrow(() -> new CoreException(PostErrorCode.POST_NOT_FOUND));
     }
 
-    public List<Post> readAll() {
-        return postRepository.findAll();
+    public List<Post> readAll(PostCategory category, int page, int size) {
+        return postRepository.findAll(category, page, size);
     }
 }
