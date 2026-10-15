@@ -8,9 +8,14 @@ import org.sopt.core.controller.response.PostListResponse;
 import org.sopt.core.controller.response.PostResponse;
 import org.sopt.core.domain.post.Post;
 import org.sopt.core.domain.post.PostCategory;
+import org.sopt.core.domain.post.PostErrorCode;
 import org.sopt.core.domain.post.PostService;
+import org.sopt.core.support.code.CommonErrorCode;
 import org.sopt.core.support.code.PostSuccessCode;
 import org.sopt.core.support.response.SuccessResponse;
+import org.sopt.core.support.swagger.ApiException;
+import org.sopt.core.support.swagger.ApiSuccess;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +29,10 @@ public class PostController {
         this.postService = postService;
     }
 
+    @ApiSuccess(value = PostSuccessCode.class, codes = "POST_CREATED")
+    @ApiException(value = PostErrorCode.class, codes = {"POST_TITLE_EMPTY", "POST_CONTENT_EMPTY"})
+    @ApiException(value = CommonErrorCode.class, codes = "INVALID_INPUT")
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public SuccessResponse<PostResponse> createPost(
             @RequestBody(required = true) CreatePostRequest request
@@ -32,6 +41,8 @@ public class PostController {
         return SuccessResponse.of(PostSuccessCode.POST_CREATED, PostResponse.from(post));
     }
 
+    @ApiSuccess(value = PostSuccessCode.class, codes = "POST_LIST_READ")
+    @ApiException(value = CommonErrorCode.class, codes = "INVALID_INPUT")
     @GetMapping
     public SuccessResponse<PostListResponse> readPosts(
             @RequestParam(required = false) PostCategory category,
@@ -42,6 +53,9 @@ public class PostController {
         return SuccessResponse.of(PostSuccessCode.POST_LIST_READ, PostListResponse.from(posts));
     }
 
+    @ApiSuccess(value = PostSuccessCode.class, codes = "POST_READ")
+    @ApiException(value = PostErrorCode.class, codes = "POST_NOT_FOUND")
+    @ApiException(value = CommonErrorCode.class, codes = "INVALID_INPUT")
     @GetMapping(path = "/{postId}")
     public SuccessResponse<PostResponse> readPost(
             @PathVariable(name = "postId") Long postId
@@ -50,6 +64,9 @@ public class PostController {
         return SuccessResponse.of(PostSuccessCode.POST_READ, PostResponse.from(post));
     }
 
+    @ApiSuccess(value = PostSuccessCode.class, codes = "POST_UPDATED")
+    @ApiException(value = PostErrorCode.class, codes = {"POST_NOT_FOUND", "POST_TITLE_EMPTY", "POST_CONTENT_EMPTY"})
+    @ApiException(value = CommonErrorCode.class, codes = "INVALID_INPUT")
     @PutMapping(path = "/{postId}")
     public SuccessResponse<PostResponse> updatePost(
             @PathVariable(name = "postId") Long postId,
@@ -60,6 +77,9 @@ public class PostController {
 
     }
 
+    @ApiSuccess(value = PostSuccessCode.class, codes = "POST_DELETED")
+    @ApiException(value = PostErrorCode.class, codes = "POST_NOT_FOUND")
+    @ApiException(value = CommonErrorCode.class, codes = "INVALID_INPUT")
     @DeleteMapping(path = "/{postId}")
     public SuccessResponse<Void> deletePost(
             @PathVariable(name = "postId") Long postId
