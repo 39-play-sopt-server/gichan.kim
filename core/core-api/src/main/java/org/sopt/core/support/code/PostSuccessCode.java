@@ -1,6 +1,6 @@
-package org.sopt.core.support.response;
+package org.sopt.core.support.code;
 
-public enum SuccessCode {
+public enum PostSuccessCode implements SuccessCode {
 
     POST_CREATED("POST-S001", "게시글이 작성되었습니다."),
     POST_LIST_READ("POST-S002", "게시글 목록을 조회했습니다."),
@@ -11,15 +11,17 @@ public enum SuccessCode {
     private final String code;
     private final String message;
 
-    SuccessCode(String code, String message) {
+    PostSuccessCode(String code, String message) {
         this.code = code;
         this.message = message;
     }
 
+    @Override
     public String getCode() {
         return code;
     }
 
+    @Override
     public String getMessage() {
         return message;
     }

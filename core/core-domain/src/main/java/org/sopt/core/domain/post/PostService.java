@@ -23,12 +23,12 @@ public class PostService {
         return postAppender.append(newPost);
     }
 
-    public List<Post> readAll() {
-        return postReader.readAll();
+    public List<Post> readAll(PostCategory category, int page, int size) {
+        return postReader.readAll(category, page, size);
     }
 
-    public Post read(Long index) {
-        return postReader.read(index);
+    public Post read(Long id) {
+        return postUpdater.increaseViewCount(id);
     }
 
     public Post edit(Long id, String title, String content, PostCategory category) {
