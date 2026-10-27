@@ -3,4 +3,10 @@ dependencies {
     testImplementation project(':core:core-domain')
 
     implementation 'org.springframework:spring-context'
+
+    // MySQL 드라이버
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // Spring Data JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 }
