@@ -37,3 +37,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+### Local config (DB credentials) ###
+application.yml
+application-local.yml
