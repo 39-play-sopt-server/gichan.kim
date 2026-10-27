@@ -1,17 +1,25 @@
 package org.sopt.storage.db.core.post;
 
+import jakarta.persistence.*;
 import org.sopt.core.domain.post.NewPost;
 import org.sopt.core.domain.post.Post;
 import org.sopt.core.domain.post.PostCategory;
 
+@Entity
+@Table(name = "post")
 public class PostEntity {
 
-    private final Long id;
-    private final String title;
-    private final String content;
-    private final PostCategory category;
-    private final long likeCount;
-    private final long viewCount;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String title;
+    private String content;
+    @Enumerated(EnumType.STRING)
+    private PostCategory category;
+    private long likeCount;
+    private long viewCount;
+
+    protected PostEntity() {}
 
     private PostEntity(Long id, String title, String content, PostCategory category, long likeCount, long viewCount) {
         this.id = id;
@@ -30,7 +38,6 @@ public class PostEntity {
         return Post.create(id, title, content, category, likeCount, viewCount);
     }
 
-    // 상태 변경은 저장되는 쪽에서. 필드가 final이라 바뀐 값을 가진 새 객체를 돌려준다
     public PostEntity updated(String title, String content, PostCategory category) {
         return new PostEntity(id, title, content, category, likeCount, viewCount);
     }
