@@ -54,15 +54,19 @@ public class PostCoreRepository implements PostRepository {
     @Override
     public Optional<Post> update(Long id, String title, String content, PostCategory category) {
         return postJpaRepository.findById(id)
-                .map(entity -> postJpaRepository.save(entity.updated(title, content, category)))
-                .map(PostEntity::toDomain);
+                .map(entity -> {
+                    entity.update(title, content, category);
+                    return entity.toDomain();
+            });
     }
 
     @Override
     public Optional<Post> increaseViewCount(Long id) {
         return postJpaRepository.findById(id)
-                .map(entity -> postJpaRepository.save(entity.viewed()))
-                .map(PostEntity::toDomain);
+                .map(entity -> {
+                    entity.viewed();
+                    return entity.toDomain();
+                });
     }
 
     @Override

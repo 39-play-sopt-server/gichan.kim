@@ -38,12 +38,20 @@ public class PostEntity {
         return Post.create(id, title, content, category, likeCount, viewCount);
     }
 
-    public PostEntity updated(String title, String content, PostCategory category) {
-        return new PostEntity(id, title, content, category, likeCount, viewCount);
+    public void update(String title, String content, PostCategory category) {
+        if (title != null) {
+            this.title = title;
+        }
+        if (content != null) {
+            this.content = content;
+        }
+        if (category != null) {
+            this.category = category;
+        }
     }
 
-    public PostEntity viewed() {
-        return new PostEntity(id, title, content, category, likeCount, viewCount + 1);
+    public void viewed() {
+        this.viewCount++;
     }
 
     public Long getId() {

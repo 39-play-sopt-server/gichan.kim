@@ -67,7 +67,7 @@ public class PostController {
     @ApiSuccess(value = PostSuccessCode.class, codes = "POST_UPDATED")
     @ApiException(value = PostErrorCode.class, codes = {"POST_NOT_FOUND", "POST_TITLE_EMPTY", "POST_CONTENT_EMPTY"})
     @ApiException(value = CommonErrorCode.class, codes = "INVALID_INPUT")
-    @PutMapping(path = "/{postId}")
+    @PatchMapping(path = "/{postId}")
     public SuccessResponse<PostResponse> updatePost(
             @PathVariable(name = "postId") Long postId,
             @RequestBody UpdatePostRequest request

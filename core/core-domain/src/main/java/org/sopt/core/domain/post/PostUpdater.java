@@ -15,7 +15,7 @@ public class PostUpdater {
     }
 
     public Post update(Long id, String title, String content, PostCategory category) {
-        postValidator.validate(title, content);
+        postValidator.validateForUpdate(title, content, category);
         return postRepository.update(id, title, content, category)
                 .orElseThrow(() -> new CoreException(PostErrorCode.POST_NOT_FOUND));
     }
