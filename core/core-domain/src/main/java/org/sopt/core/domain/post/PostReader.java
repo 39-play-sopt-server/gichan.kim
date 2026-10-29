@@ -1,6 +1,7 @@
 package org.sopt.core.domain.post;
 
 import org.sopt.core.error.CoreException;
+import org.sopt.core.support.PageResult;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,7 +20,17 @@ public class PostReader {
                 .orElseThrow(() -> new CoreException(PostErrorCode.POST_NOT_FOUND));
     }
 
-    public List<Post> readAll(PostCategory category, int page, int size) {
-        return postRepository.findAll(category, page, size);
+    public void validateExists(Long id) {
+        if (!postRepository.existsById(id)) {
+            throw new CoreException(PostErrorCode.POST_NOT_FOUND);
+        }
+    }
+
+    public List<Long> readIdsByMemberId(Long memberId) {
+        return postRepository.findIdsByMemberId(memberId);
+    }
+
+    public PageResult<Post> readAll(PostCategory category, String keyword, int page, int size) {
+        return postRepository.findAll(category, keyword, page, size);
     }
 }

@@ -1,5 +1,7 @@
 package org.sopt.core.domain.post;
 
+import org.sopt.core.support.PageResult;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -11,11 +13,21 @@ public interface PostRepository {
 
     boolean existsById(Long id);
 
-    List<Post> findAll(PostCategory category, int page, int size);
+    List<Long> findIdsByMemberId(Long memberId);
+
+    PageResult<Post> findAll(PostCategory category, String keyword, int page, int size);
 
     Optional<Post> update(Long id, String title, String content, PostCategory category);
 
     Optional<Post> increaseViewCount(Long id);
 
+    boolean increaseLikeCount(Long id);
+
+    boolean decreaseLikeCount(Long id);
+
+    void decreaseLikeCountAll(List<Long> ids);
+
     void deleteById(Long id);
+
+    void deleteAllByMemberId(Long memberId);
 }
