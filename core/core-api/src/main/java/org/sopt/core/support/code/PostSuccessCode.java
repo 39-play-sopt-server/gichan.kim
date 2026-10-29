@@ -6,7 +6,9 @@ public enum PostSuccessCode implements SuccessCode {
     POST_LIST_READ("POST-S002", "게시글 목록을 조회했습니다."),
     POST_READ("POST-S003", "게시글을 조회했습니다."),
     POST_UPDATED("POST-S004", "게시글이 수정되었습니다."),
-    POST_DELETED("POST-S005", "게시글이 삭제되었습니다.");
+    POST_DELETED("POST-S005", "게시글이 삭제되었습니다."),
+    POST_LIKED("POST-S006", "게시글에 좋아요를 등록했습니다."),
+    POST_UNLIKED("POST-S007", "게시글 좋아요를 취소했습니다.");
 
     private final String code;
     private final String message;
