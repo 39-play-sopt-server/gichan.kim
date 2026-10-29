@@ -1,20 +1,21 @@
 package org.sopt.core.domain.post;
 
+import org.sopt.core.domain.member.MemberReader;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PostAppender {
 
     private final PostRepository postRepository;
-    private final PostValidator postValidator;
+    private final MemberReader memberReader;
 
-    public PostAppender(PostRepository postRepository, PostValidator postValidator) {
+    public PostAppender(PostRepository postRepository, MemberReader memberReader) {
         this.postRepository = postRepository;
-        this.postValidator = postValidator;
+        this.memberReader = memberReader;
     }
 
     public Post append(NewPost newPost) {
-        postValidator.validate(newPost.title(), newPost.content());
+        memberReader.validateExists(newPost.memberId());
         return postRepository.save(newPost);
     }
 }
