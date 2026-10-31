@@ -18,4 +18,8 @@ public class PostRemover {
         }
         postRepository.deleteById(id);
     }
+
+    public void removeAllByMemberId(Long memberId) {
+        postRepository.deleteAllByMemberId(memberId);
+    }
 }

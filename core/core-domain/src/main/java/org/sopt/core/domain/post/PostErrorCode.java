@@ -4,9 +4,7 @@ import org.sopt.core.error.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 public enum PostErrorCode implements ErrorCode {
-    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST-E001", "존재하지 않는 게시글입니다."),
-    POST_TITLE_EMPTY(HttpStatus.BAD_REQUEST, "POST-E002", "제목은 비어 있을 수 없습니다."),
-    POST_CONTENT_EMPTY(HttpStatus.BAD_REQUEST, "POST-E003", "본문은 비어 있을 수 없습니다.");
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST-E001", "존재하지 않는 게시글입니다.");
 
     private final HttpStatus status;
     private final String code;
