@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import org.sopt.core.domain.reaction.NewReaction;
@@ -19,6 +20,10 @@ import org.sopt.storage.db.core.BaseEntity;
         uniqueConstraints = @UniqueConstraint(
                 name = "uk_reaction_target_member_type",
                 columnNames = {"target_type", "target_id", "member_id", "reaction_type"}
+        ),
+        indexes = @Index(
+                name = "idx_reaction_member",
+                columnList = "member_id, target_type, reaction_type, status"
         )
 )
 public class ReactionEntity extends BaseEntity {
@@ -57,10 +62,6 @@ public class ReactionEntity extends BaseEntity {
 
     public Reaction toDomain() {
         return Reaction.create(getId(), targetType, targetId, memberId, reactionType, status);
-    }
-
-    public void changeStatus(ReactionStatus status) {
-        this.status = status;
     }
 
     public ReactionTargetType getTargetType() {
