@@ -1,6 +1,7 @@
 package org.sopt.core.domain.reaction;
 
 import org.sopt.core.error.CoreException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -22,7 +23,7 @@ public class ReactionService {
         NewReaction newReaction = new NewReaction(targetType, targetId, memberId, ReactionType.LIKE);
         Optional<Reaction> existing = reactionReader.find(newReaction);
         if (existing.isEmpty()) {
-            reactionAppender.append(newReaction);
+            append(newReaction);
             return;
         }
         Reaction reaction = existing.get();
@@ -38,5 +39,13 @@ public class ReactionService {
                 .filter(Reaction::isActive)
                 .orElseThrow(() -> new CoreException(ReactionErrorCode.LIKE_NOT_FOUND));
         reactionUpdater.unlike(reaction.getId());
+    }
+
+    private void append(NewReaction newReaction) {
+        try {
+            reactionAppender.append(newReaction);
+        } catch (DataIntegrityViolationException e) {
+            throw new CoreException(ReactionErrorCode.LIKE_ALREADY_EXISTS);
+        }
     }
 }

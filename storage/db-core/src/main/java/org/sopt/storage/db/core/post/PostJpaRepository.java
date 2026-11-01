@@ -33,23 +33,23 @@ public interface PostJpaRepository extends JpaRepository<PostEntity, Long> {
     )
     Page<PostEntity> searchByTitle(@Param("keyword") String keyword, @Param("category") String category, Pageable pageable);
 
-    @Modifying(clearAutomatically = true)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("update PostEntity p set p.viewCount = p.viewCount + 1 where p.id = :id")
     int increaseViewCount(@Param("id") Long id);
 
-    @Modifying(clearAutomatically = true)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("update PostEntity p set p.likeCount = p.likeCount + 1 where p.id = :id")
     int increaseLikeCount(@Param("id") Long id);
 
-    @Modifying(clearAutomatically = true)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("update PostEntity p set p.likeCount = case when p.likeCount > 0 then p.likeCount - 1 else 0 end where p.id = :id")
     int decreaseLikeCount(@Param("id") Long id);
 
-    @Modifying(clearAutomatically = true)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("update PostEntity p set p.likeCount = case when p.likeCount > 0 then p.likeCount - 1 else 0 end where p.id in :ids")
     int decreaseLikeCountAll(@Param("ids") List<Long> ids);
 
-    @Modifying(clearAutomatically = true)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("delete from PostEntity p where p.memberId = :memberId")
     int deleteAllByMemberId(@Param("memberId") Long memberId);
 }

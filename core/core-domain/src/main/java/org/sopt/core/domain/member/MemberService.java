@@ -42,10 +42,10 @@ public class MemberService {
     public void remove(Long id) {
         memberReader.validateExists(id);
         List<Long> likedPostIds = reactionReader.readLikedTargetIds(ReactionTargetType.POST, id);
-        postUpdater.decreaseLikeCountAll(likedPostIds);
         List<Long> postIds = postReader.readIdsByMemberId(id);
         reactionRemover.removeAllByTargets(ReactionTargetType.POST, postIds);
         reactionRemover.removeAllByMemberId(id);
+        postUpdater.decreaseLikeCountAll(likedPostIds);
         postRemover.removeAllByMemberId(id);
         memberRemover.remove(id);
     }

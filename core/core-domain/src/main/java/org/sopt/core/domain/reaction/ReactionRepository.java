@@ -11,7 +11,7 @@ public interface ReactionRepository {
 
     List<Long> findActiveTargetIds(ReactionTargetType targetType, Long memberId, ReactionType type);
 
-    Optional<Reaction> updateStatus(Long id, ReactionStatus status);
+    boolean updateStatus(Long id, ReactionStatus from, ReactionStatus to);
 
     void deleteAllByMemberId(Long memberId);
 

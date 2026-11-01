@@ -52,8 +52,8 @@ public class PostService {
 
     @Transactional
     public void remove(Long id) {
-        postRemover.remove(id);
         reactionRemover.removeAllByTargets(ReactionTargetType.POST, List.of(id));
+        postRemover.remove(id);
     }
 
     @Transactional

@@ -13,12 +13,14 @@ public class ReactionUpdater {
     }
 
     public void like(Long id) {
-        reactionRepository.updateStatus(id, ReactionStatus.ACTIVE)
-                .orElseThrow(() -> new CoreException(ReactionErrorCode.LIKE_NOT_FOUND));
+        if (!reactionRepository.updateStatus(id, ReactionStatus.INACTIVE, ReactionStatus.ACTIVE)) {
+            throw new CoreException(ReactionErrorCode.LIKE_ALREADY_EXISTS);
+        }
     }
 
     public void unlike(Long id) {
-        reactionRepository.updateStatus(id, ReactionStatus.INACTIVE)
-                .orElseThrow(() -> new CoreException(ReactionErrorCode.LIKE_NOT_FOUND));
+        if (!reactionRepository.updateStatus(id, ReactionStatus.ACTIVE, ReactionStatus.INACTIVE)) {
+            throw new CoreException(ReactionErrorCode.LIKE_NOT_FOUND);
+        }
     }
 }

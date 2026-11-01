@@ -18,11 +18,15 @@ public interface ReactionJpaRepository extends JpaRepository<ReactionEntity, Lon
     @Query("select r.targetId from ReactionEntity r where r.targetType = :targetType and r.memberId = :memberId and r.reactionType = :reactionType and r.status = :status")
     List<Long> findTargetIds(@Param("targetType") ReactionTargetType targetType, @Param("memberId") Long memberId, @Param("reactionType") ReactionType reactionType, @Param("status") ReactionStatus status);
 
-    @Modifying(clearAutomatically = true)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("update ReactionEntity r set r.status = :to where r.id = :id and r.status = :from")
+    int updateStatus(@Param("id") Long id, @Param("from") ReactionStatus from, @Param("to") ReactionStatus to);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("delete from ReactionEntity r where r.memberId = :memberId")
     int deleteAllByMemberId(@Param("memberId") Long memberId);
 
-    @Modifying(clearAutomatically = true)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("delete from ReactionEntity r where r.targetType = :targetType and r.targetId in :targetIds")
     int deleteAllByTargetTypeAndTargetIdIn(@Param("targetType") ReactionTargetType targetType, @Param("targetIds") List<Long> targetIds);
 }

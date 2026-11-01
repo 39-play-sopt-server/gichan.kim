@@ -42,12 +42,8 @@ public class ReactionCoreRepository implements ReactionRepository {
     }
 
     @Override
-    public Optional<Reaction> updateStatus(Long id, ReactionStatus status) {
-        return reactionJpaRepository.findById(id)
-                .map(entity -> {
-                    entity.changeStatus(status);
-                    return entity.toDomain();
-                });
+    public boolean updateStatus(Long id, ReactionStatus from, ReactionStatus to) {
+        return reactionJpaRepository.updateStatus(id, from, to) > 0;
     }
 
     @Override
