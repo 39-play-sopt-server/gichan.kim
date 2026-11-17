@@ -1,6 +1,7 @@
 package org.sopt.core.support.auth;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.sopt.core.domain.auth.AuthErrorCode;
@@ -31,6 +32,8 @@ public class JwtTokenParser implements TokenParser {
                     .getPayload();
 
             return Long.valueOf(claims.getSubject());
+        } catch (ExpiredJwtException e) {
+            throw new CoreException(AuthErrorCode.EXPIRED_TOKEN);
         } catch (JwtException | IllegalArgumentException e) {
             throw new CoreException(AuthErrorCode.INVALID_TOKEN);
         }

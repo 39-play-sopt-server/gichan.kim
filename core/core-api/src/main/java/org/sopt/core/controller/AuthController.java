@@ -56,7 +56,7 @@ public class AuthController {
     }
 
     @ApiSuccess(value = AuthSuccessCode.class, codes = "TOKEN_REISSUED")
-    @ApiException(value = AuthErrorCode.class, codes = "INVALID_TOKEN")
+    @ApiException(value = AuthErrorCode.class, codes = {"INVALID_TOKEN", "EXPIRED_TOKEN"})
     @ApiException(value = MemberErrorCode.class, codes = "MEMBER_NOT_FOUND")
     @PostMapping(path = "/reissue")
     public ResponseEntity<SuccessResponse<Void>> reissue(

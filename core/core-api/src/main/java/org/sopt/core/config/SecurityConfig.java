@@ -1,6 +1,7 @@
 package org.sopt.core.config;
 
 import org.sopt.core.domain.auth.TokenParser;
+import org.sopt.core.support.auth.JwtAuthenticationEntryPoint;
 import org.sopt.core.support.auth.JwtAuthenticationFilter;
 import org.sopt.core.support.auth.JwtProperties;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -17,7 +17,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -31,10 +30,12 @@ import java.util.List;
 public class SecurityConfig {
 
     private final TokenParser tokenParser;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final String[] allowedOrigins;
 
-    public SecurityConfig(TokenParser tokenParser, @Value("${cors.allowed-origins}") String[] allowedOrigins) {
+    public SecurityConfig(TokenParser tokenParser, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, @Value("${cors.allowed-origins}") String[] allowedOrigins) {
         this.tokenParser = tokenParser;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.allowedOrigins = allowedOrigins;
     }
 
@@ -53,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/posts", "/api/v1/posts/*").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(e -> e
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .addFilterBefore(new JwtAuthenticationFilter(tokenParser),
                         UsernamePasswordAuthenticationFilter.class)
                 .build();

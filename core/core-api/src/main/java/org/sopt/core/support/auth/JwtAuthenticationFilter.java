@@ -17,6 +17,7 @@ import java.util.List;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    static final String AUTH_ERROR_ATTRIBUTE = "authErrorCode";
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final TokenParser tokenParser;
@@ -37,7 +38,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(memberId, null, List.of());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (CoreException ignored) {
+            } catch (CoreException e) {
+                request.setAttribute(AUTH_ERROR_ATTRIBUTE, e.getErrorCode());
             }
         }
 
