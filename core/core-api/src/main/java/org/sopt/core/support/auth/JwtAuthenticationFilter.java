@@ -1,10 +1,12 @@
 package org.sopt.core.support.auth;
 
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.sopt.core.domain.auth.TokenParser;
+import org.sopt.core.domain.auth.TokenType;
+import org.sopt.core.error.CoreException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,12 +17,13 @@ import java.util.List;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    static final String AUTH_ERROR_ATTRIBUTE = "authErrorCode";
     private static final String BEARER_PREFIX = "Bearer ";
 
-    private final JwtProvider jwtProvider;
+    private final TokenParser tokenParser;
 
-    public JwtAuthenticationFilter(JwtProvider jwtProvider) {
-        this.jwtProvider = jwtProvider;
+    public JwtAuthenticationFilter(TokenParser tokenParser) {
+        this.tokenParser = tokenParser;
     }
 
     @Override
@@ -31,11 +34,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (token != null) {
             try {
-                Long memberId = jwtProvider.getMemberId(token);
+                Long memberId = tokenParser.parseMemberId(token, TokenType.ACCESS);
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(memberId, null, List.of());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (JwtException | IllegalArgumentException ignored) {
+            } catch (CoreException e) {
+                request.setAttribute(AUTH_ERROR_ATTRIBUTE, e.getErrorCode());
             }
         }
 

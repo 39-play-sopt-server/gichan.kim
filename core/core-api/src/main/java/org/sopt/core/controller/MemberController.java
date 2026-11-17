@@ -2,11 +2,13 @@ package org.sopt.core.controller;
 
 import org.sopt.core.domain.member.MemberErrorCode;
 import org.sopt.core.domain.member.MemberService;
-import org.sopt.core.support.code.CommonErrorCode;
+import org.sopt.core.support.auth.RefreshTokenCookieProvider;
 import org.sopt.core.support.code.MemberSuccessCode;
 import org.sopt.core.support.response.SuccessResponse;
 import org.sopt.core.support.swagger.ApiException;
 import org.sopt.core.support.swagger.ApiSuccess;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +16,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/api/v1/members")
 public class MemberController {
     private final MemberService memberService;
+    private final RefreshTokenCookieProvider refreshTokenCookieProvider;
 
-    public MemberController(MemberService memberService) {
+    public MemberController(MemberService memberService, RefreshTokenCookieProvider refreshTokenCookieProvider) {
         this.memberService = memberService;
+        this.refreshTokenCookieProvider = refreshTokenCookieProvider;
     }
 
     @ApiSuccess(value = MemberSuccessCode.class, codes = "MEMBER_ME_READ")
@@ -29,12 +33,13 @@ public class MemberController {
 
     @ApiSuccess(value = MemberSuccessCode.class, codes = "MEMBER_DELETED")
     @ApiException(value = MemberErrorCode.class, codes = "MEMBER_NOT_FOUND")
-    @ApiException(value = CommonErrorCode.class, codes = "INVALID_INPUT")
-    @DeleteMapping(path = "/{memberId}")
-    public SuccessResponse<Void> deleteMember(
-            @PathVariable(name = "memberId") Long memberId
+    @DeleteMapping(path = "/me")
+    public ResponseEntity<SuccessResponse<Void>> withdraw(
+            @AuthenticationPrincipal Long memberId
     ) {
         memberService.remove(memberId);
-        return SuccessResponse.of(MemberSuccessCode.MEMBER_DELETED);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookieProvider.expire().toString())
+                .body(SuccessResponse.of(MemberSuccessCode.MEMBER_DELETED));
     }
 }

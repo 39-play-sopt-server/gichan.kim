@@ -46,18 +46,22 @@ public class PostService {
         return withMemberName(postUpdater.increaseViewCount(id));
     }
 
-    public Post edit(Long id, String title, String content, PostCategory category) {
+    @Transactional
+    public Post edit(Long id, Long memberId, String title, String content, PostCategory category) {
+        postReader.validateWriter(id, memberId);
         return withMemberName(postUpdater.update(id, title, content, category));
     }
 
     @Transactional
-    public void remove(Long id) {
+    public void remove(Long id, Long memberId) {
+        postReader.validateWriter(id, memberId);
         reactionRemover.removeAllByTargets(ReactionTargetType.POST, List.of(id));
         postRemover.remove(id);
     }
 
     @Transactional
     public void like(Long id, Long memberId) {
+        memberReader.validateExists(memberId);
         postReader.validateExists(id);
         reactionService.like(ReactionTargetType.POST, id, memberId);
         postUpdater.increaseLikeCount(id);
@@ -65,6 +69,7 @@ public class PostService {
 
     @Transactional
     public void unlike(Long id, Long memberId) {
+        memberReader.validateExists(memberId);
         postReader.validateExists(id);
         reactionService.unlike(ReactionTargetType.POST, id, memberId);
         postUpdater.decreaseLikeCount(id);
