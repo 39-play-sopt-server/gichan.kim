@@ -67,4 +67,12 @@ public class AuthController {
                 .headers(headers -> headers.setBearerAuth(accessToken))
                 .body(SuccessResponse.of(AuthSuccessCode.TOKEN_REISSUED));
     }
+
+    @ApiSuccess(value = AuthSuccessCode.class, codes = "LOGGED_OUT")
+    @PostMapping(path = "/logout")
+    public ResponseEntity<SuccessResponse<Void>> logout() {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookieProvider.expire().toString())
+                .body(SuccessResponse.of(AuthSuccessCode.LOGGED_OUT));
+    }
 }
