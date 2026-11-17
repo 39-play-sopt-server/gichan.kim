@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -20,6 +21,16 @@ public class MemberReader {
         if (!memberRepository.existsById(id)) {
             throw new CoreException(MemberErrorCode.MEMBER_NOT_FOUND);
         }
+    }
+
+    public void validateEmailNotExists(String email) {
+        if (memberRepository.existsByEmail(email)) {
+            throw new CoreException(MemberErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+    }
+
+    public Optional<Member> findByEmail(String email) {
+        return memberRepository.findByEmail(email);
     }
 
     public Map<Long, String> readNamesByIds(List<Long> ids) {

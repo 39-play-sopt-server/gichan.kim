@@ -15,7 +15,6 @@ import java.util.List;
 public class MemberService {
 
     private final MemberReader memberReader;
-    private final MemberAppender memberAppender;
     private final MemberRemover memberRemover;
     private final PostReader postReader;
     private final PostUpdater postUpdater;
@@ -23,19 +22,14 @@ public class MemberService {
     private final ReactionReader reactionReader;
     private final ReactionRemover reactionRemover;
 
-    public MemberService(MemberReader memberReader, MemberAppender memberAppender, MemberRemover memberRemover, PostReader postReader, PostUpdater postUpdater, PostRemover postRemover, ReactionReader reactionReader, ReactionRemover reactionRemover) {
+    public MemberService(MemberReader memberReader, MemberRemover memberRemover, PostReader postReader, PostUpdater postUpdater, PostRemover postRemover, ReactionReader reactionReader, ReactionRemover reactionRemover) {
         this.memberReader = memberReader;
-        this.memberAppender = memberAppender;
         this.memberRemover = memberRemover;
         this.postReader = postReader;
         this.postUpdater = postUpdater;
         this.postRemover = postRemover;
         this.reactionReader = reactionReader;
         this.reactionRemover = reactionRemover;
-    }
-
-    public Member write(NewMember newMember) {
-        return memberAppender.append(newMember);
     }
 
     @Transactional
