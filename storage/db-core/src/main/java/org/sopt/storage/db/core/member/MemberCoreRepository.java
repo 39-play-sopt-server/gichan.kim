@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Transactional
@@ -31,8 +32,20 @@ public class MemberCoreRepository implements MemberRepository {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<Member> findByEmail(String email) {
+        return memberJpaRepository.findByEmail(email).map(MemberEntity::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public boolean existsById(Long id) {
         return memberJpaRepository.existsById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsByEmail(String email) {
+        return memberJpaRepository.existsByEmail(email);
     }
 
     @Override

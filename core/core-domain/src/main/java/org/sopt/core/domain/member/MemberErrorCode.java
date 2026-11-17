@@ -4,7 +4,8 @@ import org.sopt.core.error.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 public enum MemberErrorCode implements ErrorCode {
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER-E001", "존재하지 않는 회원입니다.");
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER-E001", "존재하지 않는 회원입니다."),
+    EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "MEMBER-E002", "이미 가입된 이메일입니다.");
 
     private final HttpStatus status;
     private final String code;
