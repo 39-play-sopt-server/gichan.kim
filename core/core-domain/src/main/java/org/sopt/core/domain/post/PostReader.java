@@ -26,6 +26,12 @@ public class PostReader {
         }
     }
 
+    public void validateWriter(Long id, Long memberId) {
+        if (!read(id).getMemberId().equals(memberId)) {
+            throw new CoreException(PostErrorCode.POST_FORBIDDEN);
+        }
+    }
+
     public List<Long> readIdsByMemberId(Long memberId) {
         return postRepository.findIdsByMemberId(memberId);
     }

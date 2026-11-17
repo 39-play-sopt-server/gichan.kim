@@ -73,26 +73,28 @@ public class PostController {
     }
 
     @ApiSuccess(value = PostSuccessCode.class, codes = "POST_UPDATED")
-    @ApiException(value = PostErrorCode.class, codes = "POST_NOT_FOUND")
+    @ApiException(value = PostErrorCode.class, codes = {"POST_NOT_FOUND", "POST_FORBIDDEN"})
     @ApiException(value = MemberErrorCode.class, codes = "MEMBER_NOT_FOUND")
     @ApiException(value = CommonErrorCode.class, codes = "INVALID_INPUT")
     @PatchMapping(path = "/{postId}")
     public SuccessResponse<PostResponse> updatePost(
+            @AuthenticationPrincipal Long memberId,
             @PathVariable(name = "postId") Long postId,
             @Valid @RequestBody UpdatePostRequest request
     ) {
-        Post post = postService.edit(postId, request.title(), request.content(), request.category());
+        Post post = postService.edit(postId, memberId, request.title(), request.content(), request.category());
         return SuccessResponse.of(PostSuccessCode.POST_UPDATED, PostResponse.from(post));
     }
 
     @ApiSuccess(value = PostSuccessCode.class, codes = "POST_DELETED")
-    @ApiException(value = PostErrorCode.class, codes = "POST_NOT_FOUND")
+    @ApiException(value = PostErrorCode.class, codes = {"POST_NOT_FOUND", "POST_FORBIDDEN"})
     @ApiException(value = CommonErrorCode.class, codes = "INVALID_INPUT")
     @DeleteMapping(path = "/{postId}")
     public SuccessResponse<Void> deletePost(
+            @AuthenticationPrincipal Long memberId,
             @PathVariable(name = "postId") Long postId
     ) {
-        postService.remove(postId);
+        postService.remove(postId, memberId);
         return SuccessResponse.of(PostSuccessCode.POST_DELETED);
     }
 
