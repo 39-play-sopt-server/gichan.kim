@@ -3,29 +3,30 @@ package org.sopt.core.controller;
 import jakarta.validation.Valid;
 import org.sopt.core.controller.request.LoginRequest;
 import org.sopt.core.controller.request.SignupRequest;
-import org.sopt.core.controller.response.LoginResponse;
 import org.sopt.core.domain.auth.AuthErrorCode;
 import org.sopt.core.domain.auth.AuthService;
-import org.sopt.core.domain.auth.TokenIssuer;
-import org.sopt.core.domain.auth.TokenType;
+import org.sopt.core.domain.auth.TokenPair;
 import org.sopt.core.domain.member.MemberErrorCode;
+import org.sopt.core.support.auth.RefreshTokenCookieProvider;
 import org.sopt.core.support.code.AuthSuccessCode;
 import org.sopt.core.support.code.CommonErrorCode;
 import org.sopt.core.support.response.SuccessResponse;
 import org.sopt.core.support.swagger.ApiException;
 import org.sopt.core.support.swagger.ApiSuccess;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/api/v1/auth")
 public class AuthController {
     private final AuthService authService;
-    private final TokenIssuer tokenIssuer;
+    private final RefreshTokenCookieProvider refreshTokenCookieProvider;
 
-    public AuthController(AuthService authService, TokenIssuer tokenIssuer) {
+    public AuthController(AuthService authService, RefreshTokenCookieProvider refreshTokenCookieProvider) {
         this.authService = authService;
-        this.tokenIssuer = tokenIssuer;
+        this.refreshTokenCookieProvider = refreshTokenCookieProvider;
     }
 
     @ApiSuccess(value = AuthSuccessCode.class, codes = "SIGNED_UP")
@@ -44,11 +45,26 @@ public class AuthController {
     @ApiException(value = AuthErrorCode.class, codes = "INVALID_CREDENTIALS")
     @ApiException(value = CommonErrorCode.class, codes = "INVALID_INPUT")
     @PostMapping(path = "/login")
-    public SuccessResponse<LoginResponse> login(
+    public ResponseEntity<SuccessResponse<Void>> login(
             @Valid @RequestBody(required = true) LoginRequest request
     ) {
-        Long memberId = authService.login(request.email(), request.password());
-        String accessToken = tokenIssuer.issue(memberId, TokenType.ACCESS);
-        return SuccessResponse.of(AuthSuccessCode.LOGGED_IN, new LoginResponse(accessToken));
+        TokenPair tokenPair = authService.login(request.email(), request.password());
+        return ResponseEntity.ok()
+                .headers(headers -> headers.setBearerAuth(tokenPair.accessToken()))
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookieProvider.create(tokenPair.refreshToken()).toString())
+                .body(SuccessResponse.of(AuthSuccessCode.LOGGED_IN));
+    }
+
+    @ApiSuccess(value = AuthSuccessCode.class, codes = "TOKEN_REISSUED")
+    @ApiException(value = AuthErrorCode.class, codes = "INVALID_TOKEN")
+    @ApiException(value = MemberErrorCode.class, codes = "MEMBER_NOT_FOUND")
+    @PostMapping(path = "/reissue")
+    public ResponseEntity<SuccessResponse<Void>> reissue(
+            @CookieValue(name = RefreshTokenCookieProvider.COOKIE_NAME, required = false) String refreshToken
+    ) {
+        String accessToken = authService.reissue(refreshToken);
+        return ResponseEntity.ok()
+                .headers(headers -> headers.setBearerAuth(accessToken))
+                .body(SuccessResponse.of(AuthSuccessCode.TOKEN_REISSUED));
     }
 }
