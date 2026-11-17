@@ -6,8 +6,9 @@ import org.sopt.core.controller.request.SignupRequest;
 import org.sopt.core.controller.response.LoginResponse;
 import org.sopt.core.domain.auth.AuthErrorCode;
 import org.sopt.core.domain.auth.AuthService;
+import org.sopt.core.domain.auth.TokenIssuer;
+import org.sopt.core.domain.auth.TokenType;
 import org.sopt.core.domain.member.MemberErrorCode;
-import org.sopt.core.support.auth.JwtProvider;
 import org.sopt.core.support.code.AuthSuccessCode;
 import org.sopt.core.support.code.CommonErrorCode;
 import org.sopt.core.support.response.SuccessResponse;
@@ -20,11 +21,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/api/v1/auth")
 public class AuthController {
     private final AuthService authService;
-    private final JwtProvider jwtProvider;
+    private final TokenIssuer tokenIssuer;
 
-    public AuthController(AuthService authService, JwtProvider jwtProvider) {
+    public AuthController(AuthService authService, TokenIssuer tokenIssuer) {
         this.authService = authService;
-        this.jwtProvider = jwtProvider;
+        this.tokenIssuer = tokenIssuer;
     }
 
     @ApiSuccess(value = AuthSuccessCode.class, codes = "SIGNED_UP")
@@ -47,7 +48,7 @@ public class AuthController {
             @Valid @RequestBody(required = true) LoginRequest request
     ) {
         Long memberId = authService.login(request.email(), request.password());
-        String accessToken = jwtProvider.createAccessToken(memberId);
+        String accessToken = tokenIssuer.issue(memberId, TokenType.ACCESS);
         return SuccessResponse.of(AuthSuccessCode.LOGGED_IN, new LoginResponse(accessToken));
     }
 }

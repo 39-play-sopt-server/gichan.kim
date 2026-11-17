@@ -1,7 +1,9 @@
 package org.sopt.core.config;
 
+import org.sopt.core.domain.auth.TokenParser;
 import org.sopt.core.support.auth.JwtAuthenticationFilter;
-import org.sopt.core.support.auth.JwtProvider;
+import org.sopt.core.support.auth.JwtProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -17,12 +19,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableConfigurationProperties(JwtProperties.class)
 public class SecurityConfig {
 
-    private final JwtProvider jwtProvider;
+    private final TokenParser tokenParser;
 
-    public SecurityConfig(JwtProvider jwtProvider) {
-        this.jwtProvider = jwtProvider;
+    public SecurityConfig(TokenParser tokenParser) {
+        this.tokenParser = tokenParser;
     }
 
     @Bean
@@ -38,7 +41,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider),
+                .addFilterBefore(new JwtAuthenticationFilter(tokenParser),
                         UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
