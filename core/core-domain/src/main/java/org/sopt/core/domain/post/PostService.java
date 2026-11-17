@@ -58,6 +58,7 @@ public class PostService {
 
     @Transactional
     public void like(Long id, Long memberId) {
+        memberReader.validateExists(memberId);
         postReader.validateExists(id);
         reactionService.like(ReactionTargetType.POST, id, memberId);
         postUpdater.increaseLikeCount(id);
@@ -65,6 +66,7 @@ public class PostService {
 
     @Transactional
     public void unlike(Long id, Long memberId) {
+        memberReader.validateExists(memberId);
         postReader.validateExists(id);
         reactionService.unlike(ReactionTargetType.POST, id, memberId);
         postUpdater.decreaseLikeCount(id);
